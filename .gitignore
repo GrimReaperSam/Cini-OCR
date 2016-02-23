@@ -1,0 +1,8 @@
+# Ignore pycharm configuration
+/.idea
+
+# Ignore sample images folder
+/samples
+
+# Ignore result folder
+/results
