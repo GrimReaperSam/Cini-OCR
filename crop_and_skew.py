@@ -10,7 +10,6 @@ def crop_and_skew(image):
 
     gray = cv2.bilateralFilter(image, 11, 75, 75)
     gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
-    # gray = cv2.GaussianBlur(gray, (5, 5), 0)
     edged = cv2.Canny(gray, 75, 200)
 
     (contours, _) = cv2.findContours(edged.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
