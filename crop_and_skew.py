@@ -20,6 +20,8 @@ def crop_and_skew(image):
         rect = cv2.minAreaRect(contour)
         (_, (w, h), _) = rect
         area = w * h
+        if area < 400 * 400:
+            continue
         if area > max_area:
             max_area = area
             box = cv2.cv.BoxPoints(rect)
