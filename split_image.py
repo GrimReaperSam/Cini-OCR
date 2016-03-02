@@ -2,7 +2,6 @@ import cv2
 import utils
 import numpy as np
 from itertools import groupby
-from skimage import filters, img_as_ubyte, color
 
 
 # line is of the form (x1, y1, x2, y2)
@@ -28,20 +27,19 @@ def split_image(page):
 
     (contours, _) = cv2.findContours(dil.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-    max_rect = None
-    # max_rect = None
+    max_box = None
     max_area = 0
     for cnt in contours:
         rect = cv2.minAreaRect(cnt)
+        box = np.int0(cv2.cv.BoxPoints(rect))
+        y = utils.abcd_rect(box.reshape(4, 2))[0][1]
         (_, (w, h), _) = rect
         area = w * h
-        if area > page.shape[1] * 450:
+        if area > page.shape[1] * 450 or y < 50:
             continue
         if area > max_area:
             max_area = area
-            max_rect = rect
-
-    max_box = np.int0(cv2.cv.BoxPoints(max_rect))
+            max_box = box
 
     scan = utils.crop_rectangle_warp(orig, max_box.reshape(4, 2) * ratio)
 
