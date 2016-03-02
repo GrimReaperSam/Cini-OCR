@@ -27,4 +27,5 @@ def crop_and_skew(image):
             box = cv2.cv.BoxPoints(rect)
     box = np.int0(box)
 
-    return utils.crop_rectangle_warp(orig, box.reshape(4, 2) * ratio)
+    res = utils.crop_rectangle_warp(orig, box.reshape(4, 2) * ratio)
+    return res[0:res.shape[0] - 100, 0:res.shape[1]]
