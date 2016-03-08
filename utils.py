@@ -24,8 +24,22 @@ def abcd_rect(pts):
     return rect
 
 
-def crop_rectangle_warp(image, rect_coords):
+def resize(abcd, amount):
+    (a, b, c, d) = abcd
+
+    na = [a[0] - amount, a[1] - amount]
+    nb = [b[0] + amount, b[1] - amount]
+    nc = [c[0] + amount, c[1] + amount]
+    nd = [d[0] - amount, d[1] + amount]
+
+    return np.asarray([na, nb, nc, nd], np.float32)
+
+
+def crop_rectangle_warp(image, rect_coords, ratio, amount=0):
     orig_rect = abcd_rect(rect_coords)
+    if amount != 0:
+        orig_rect = resize(orig_rect, amount)
+    orig_rect *= ratio
     (a, b, c, d) = orig_rect
 
     w = max(int(np.linalg.norm(a - b)), int(np.linalg.norm(c - d)))
