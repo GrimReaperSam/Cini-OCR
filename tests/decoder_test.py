@@ -5,11 +5,11 @@ import os
 import cv2
 import barcode
 import json
+from shared import data
 
-VERSO_SUBSTR = '_verso.cr2'
 SAMPLES_DIR = '../samples'
 
-versos = filter(lambda f: VERSO_SUBSTR in f, os.listdir(SAMPLES_DIR))
+versos = filter(lambda f: data['VERSO_SUBSTR'] in f, os.listdir("../%s" % data['SAMPLES_DIR']))
 
 
 class DecoderTest(unittest.TestCase):
@@ -18,7 +18,7 @@ class DecoderTest(unittest.TestCase):
             expected = json.loads(results.read())
 
         for filename in sorted(versos):
-            name = re.sub(VERSO_SUBSTR, '', filename)
+            name = re.sub(data['VERSO_SUBSTR'], '', filename)
             name = re.sub('_', '', name)
             im = cv2.imread("%s/%s" % (SAMPLES_DIR, filename))
             crop = crop_and_skew(im)
