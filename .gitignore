@@ -6,3 +6,8 @@
 
 # Ignore result folder
 /results
+
+# Ignore pynative and ipynb
+/.ipynb_checkpoints
+/.pynative
+*.ipynb
