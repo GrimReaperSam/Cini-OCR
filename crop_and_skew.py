@@ -11,7 +11,8 @@ def crop_and_skew(image):
     image = cv2.resize(image, (int(image.shape[1]/ratio), 500))
 
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    edged = cv2.Canny(gray, 50, 200)
+    _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    edged = cv2.Canny(thresh, 50, 200)
 
     (contours, _) = cv2.findContours(edged.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 

@@ -20,28 +20,38 @@ def split_image(page):
     orig = page.copy()
     page = cv2.resize(page, (int(width / ratio), 500))
 
-    # Extracting image section
-    edged = cv2.Canny(page, 50, 200)
-    kernel = np.ones((3, 3), np.uint8)
-    dil = cv2.dilate(edged, kernel, iterations=1)
+    kernel = np.ones((7, 7), np.uint8)
+    dilated = cv2.dilate(page, kernel, iterations=1)
 
-    (contours, _) = cv2.findContours(dil.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    gray = cv2.cvtColor(dilated, cv2.COLOR_BGR2GRAY)
+    grad_x = cv2.Sobel(gray, ddepth=cv2.cv.CV_32F, dx=1, dy=0, ksize=-1)
+    grad_y = cv2.Sobel(gray, ddepth=cv2.cv.CV_32F, dx=0, dy=1, ksize=-1)
 
-    max_box = None
+    grad_x = cv2.convertScaleAbs(grad_x)
+    grad_y = cv2.convertScaleAbs(grad_y)
+
+    grad = cv2.addWeighted(grad_x, 0.5, grad_y, 0.5, 0)
+
+    blur = cv2.GaussianBlur(grad, (5, 5), 0)
+    ret3, th2 = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    thresh_kernel = np.ones((5, 5), np.uint8)
+    dilated = cv2.dilate(th2, thresh_kernel, iterations=2)
+
+    (contours, _) = cv2.findContours(dilated.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
     max_area = 0
-    for cnt in contours:
-        rect = cv2.minAreaRect(cnt)
-        box = np.int0(cv2.cv.BoxPoints(rect))
-        y = utils.abcd_rect(box.reshape(4, 2))[0][1]
+    max_box = None
+    for contour in contours:
+        rect = cv2.minAreaRect(contour)
         (_, (w, h), _) = rect
         area = w * h
-        if area > page.shape[1] * 450 or y < 50:
-            continue
         if area > max_area:
             max_area = area
-            max_box = box
+            max_box = cv2.cv.BoxPoints(rect)
+    max_box = np.int0(max_box)
 
-    scan = utils.crop_rectangle_warp(orig, max_box.reshape(4, 2) * ratio)
+    scan = utils.crop_rectangle_warp(orig, max_box.reshape(4, 2), ratio)
 
     # Extracting text section
     edged = cv2.Canny(page, 15, 200)
