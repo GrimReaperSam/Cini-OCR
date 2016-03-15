@@ -33,7 +33,7 @@ def crop_image_and_text(page):
     grad = cv2.addWeighted(grad_x, 0.5, grad_y, 0.5, 0)
 
     blur = cv2.GaussianBlur(grad, (5, 5), 0)
-    ret3, th2 = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    _, th2 = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
     thresh_kernel = np.ones((5, 5), np.uint8)
     dilated = cv2.dilate(th2, thresh_kernel, iterations=2)

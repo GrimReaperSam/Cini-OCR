@@ -12,7 +12,10 @@ class DecoderTest(unittest.TestCase):
             expected = json.loads(results.read())
 
         for filename in sorted(os.listdir("../results/pages")):
+            if 're' in filename:
+                continue
             name = re.sub('ve.png', '', filename)
             im = cv2.imread("../results/pages/%s" % filename)
             bar_code = barcode.detect(im)
-            self.assertEqual(bar_code, expected[name])
+            self.assertEqual(bar_code, expected[name],
+                             "Failed at %s, found %s, expected %s" % (name, bar_code, expected[name]))

@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import cv2
 import zbar
 from PIL import Image
@@ -13,7 +12,6 @@ def detect(page):
     ratio = page.shape[0] / HEIGHT_RESIZE
     orig = page.copy()
     page = cv2.resize(page, (int(width / ratio), int(HEIGHT_RESIZE)))
-    plt.imshow(page)
 
     gray = cv2.cvtColor(page, cv2.COLOR_BGR2GRAY)
 
