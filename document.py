@@ -3,7 +3,7 @@ import utils
 import numpy as np
 
 
-def crop_and_skew(image):
+def crop_cardboard(image):
     image = image[0:image.shape[0], 1000: image.shape[1]-1000]
 
     ratio = image.shape[0] / 500.0

@@ -14,7 +14,7 @@ def get_y(line):
     return line[1]
 
 
-def split_image(page):
+def crop_image_and_text(page):
     width = page.shape[1]
     ratio = page.shape[0] / 500.0
     orig = page.copy()

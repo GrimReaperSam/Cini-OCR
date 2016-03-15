@@ -1,11 +1,9 @@
 import unittest
-from crop_and_skew import *
 import re
 import os
 import cv2
 import barcode
 import json
-from shared import data
 
 
 class DecoderTest(unittest.TestCase):
