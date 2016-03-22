@@ -32,17 +32,21 @@ def crop_image_and_text(page):
     orig = page.copy()
     page = cv2.resize(page, (int(width / ratio), 500))
 
+    # -----------------------
+    # Extracting image section
+    # -----------------------
     kernel = np.ones((3, 3), np.uint8)
     dilated = cv2.dilate(page, kernel, iterations=1)
     dilated = cv2.erode(dilated, kernel, iterations=1)
 
     gray = cv2.cvtColor(dilated, cv2.COLOR_BGR2GRAY)
     gray = cv2.GaussianBlur(gray, (11, 11), 0)
-    grad_x = cv2.Sobel(gray, ddepth=cv2.cv.CV_32F, dx=1, dy=0, ksize=-1)
-    grad_y = cv2.Sobel(gray, ddepth=cv2.cv.CV_32F, dx=0, dy=1, ksize=-1)
 
+    grad_x = cv2.Sobel(gray, ddepth=cv2.cv.CV_32F, dx=1, dy=0, ksize=-1)
     grad_x = cv2.convertScaleAbs(grad_x)
     grad_x = cv2.pow(grad_x, 2)
+
+    grad_y = cv2.Sobel(gray, ddepth=cv2.cv.CV_32F, dx=0, dy=1, ksize=-1)
     grad_y = cv2.convertScaleAbs(grad_y)
     grad_y = cv2.pow(grad_y, 2)
 
@@ -72,7 +76,9 @@ def crop_image_and_text(page):
 
     scan = utils.crop_rectangle_warp(orig, max_box.reshape(4, 2), ratio)
 
+    # -----------------------
     # Extracting text section
+    # -----------------------
     horizontal_k = np.ones((1, 3), np.uint8)
     horizontal = cv2.dilate(page, horizontal_k, iterations=1)
     gray = cv2.cvtColor(horizontal, cv2.COLOR_BGR2GRAY)
