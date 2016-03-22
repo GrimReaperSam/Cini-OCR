@@ -1,7 +1,9 @@
 import cv2
 import utils
 import numpy as np
-from itertools import groupby
+import warnings
+
+ACCEPTABLE_Y_RANGES = [(60, 80), (130, 140)]
 
 
 # line is of the form (x1, y1, x2, y2)
@@ -12,6 +14,16 @@ def length(line):
 
 def get_y(line):
     return line[1]
+
+
+def validate_text_section(y_value):
+    valid = False
+    for (mini, maxi) in ACCEPTABLE_Y_RANGES:
+        if mini <= y_value <= maxi:
+            valid = True
+            break
+    if not valid:
+        warnings.warn('THIS TEXT SECTION IS WEIRD YO!')
 
 
 def crop_image_and_text(page):
@@ -83,7 +95,10 @@ def crop_image_and_text(page):
     h_lines = [line for line in h_lines if line[1] < eroded.shape[0] / 2]
 
     # Get lowest line
-    lowest = sorted(h_lines, key=get_y, reverse=True)[0]
-    text_section = orig[0:int(get_y(lowest) * ratio), 0:width]
+    lowest = get_y(sorted(h_lines, key=get_y, reverse=True)[0])
+
+    validate_text_section(lowest)
+
+    text_section = orig[0:int(lowest * ratio), 0:width]
 
     return scan, text_section
