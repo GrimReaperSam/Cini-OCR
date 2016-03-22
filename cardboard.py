@@ -61,31 +61,29 @@ def crop_image_and_text(page):
     scan = utils.crop_rectangle_warp(orig, max_box.reshape(4, 2), ratio)
 
     # Extracting text section
-    edged = cv2.Canny(page, 15, 200)
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-    close = cv2.morphologyEx(edged, cv2.MORPH_CLOSE, kernel)
+    horizontal_k = np.ones((1, 3), np.uint8)
+    horizontal = cv2.dilate(page, horizontal_k, iterations=1)
+    gray = cv2.cvtColor(horizontal, cv2.COLOR_BGR2GRAY)
+    th_gray = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
 
-    lines = cv2.HoughLinesP(close.copy(), 1, np.pi / 180, 100, 100, 10)[0]
+    # Remove the image region
+    cv2.drawContours(th_gray, [max_box], -1, (255, 255, 255), -1)
+    # Remove a bit around the image (Artifacts from dilation)
+    cv2.drawContours(th_gray, [max_box], -1, (255, 255, 255), 10)
+    # Remove noisy artifacts
+    closed = cv2.dilate(th_gray, horizontal_k, iterations=12)
 
+    # Elongate remaining lines to fill the width
+    erode_k = np.ones((1, width), np.uint8)
+    eroded = cv2.bitwise_not(cv2.erode(closed, erode_k, iterations=2))
+
+    lines = cv2.HoughLinesP(eroded.copy(), 1, np.pi / 180, 100, 5, 10)[0]
     # Filter out the vertical lines
     h_lines = [line for line in lines if line[1] == line[3]]
-    # Filter lines below the image we found above
-    (a, b, _, _) = utils.abcd_rect(max_box)
-    y_min = min(a[1], b[1])
-    h_lines = [line for line in h_lines if line[1] < y_min]
-    longest = sorted(h_lines, key=length, reverse=True)
+    h_lines = [line for line in h_lines if line[1] < eroded.shape[0] / 2]
 
-    # Group by Y and take the longest line on the same y
-    line_groups = groupby(longest, key=length)
-    candidates = []
-    for (key, data) in line_groups:
-        lowest = max(data, key=get_y)
-        candidates.append(lowest)
-
-    # Take the longest four horizontal lines
-    long_4 = sorted(candidates, key=length, reverse=True)[:4]
-
-    # Take the lowest of these lines
-    text_section = orig[0:int(get_y(max(long_4, key=get_y)) * ratio), 0:width]
+    # Get lowest line
+    lowest = sorted(h_lines, key=get_y, reverse=True)[0]
+    text_section = orig[0:int(get_y(lowest) * ratio), 0:width]
 
     return scan, text_section
