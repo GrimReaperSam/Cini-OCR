@@ -6,14 +6,8 @@ import warnings
 ACCEPTABLE_Y_RANGES = [(60, 80), (130, 140)]
 
 
-# line is of the form (x1, y1, x2, y2)
-def length(line):
-    (ox, _, dx, _) = line
-    return abs(dx - ox)
-
-
 def get_y(line):
-    return line[1]
+    return line[0][1]
 
 
 def validate_text_section(y_value):
@@ -42,11 +36,11 @@ def crop_image_and_text(page):
     gray = cv2.cvtColor(dilated, cv2.COLOR_BGR2GRAY)
     gray = cv2.GaussianBlur(gray, (11, 11), 0)
 
-    grad_x = cv2.Sobel(gray, ddepth=cv2.cv.CV_32F, dx=1, dy=0, ksize=-1)
+    grad_x = cv2.Sobel(gray, ddepth=cv2.CV_32F, dx=1, dy=0, ksize=-1)
     grad_x = cv2.convertScaleAbs(grad_x)
     grad_x = cv2.pow(grad_x, 2)
 
-    grad_y = cv2.Sobel(gray, ddepth=cv2.cv.CV_32F, dx=0, dy=1, ksize=-1)
+    grad_y = cv2.Sobel(gray, ddepth=cv2.CV_32F, dx=0, dy=1, ksize=-1)
     grad_y = cv2.convertScaleAbs(grad_y)
     grad_y = cv2.pow(grad_y, 2)
 
@@ -59,7 +53,7 @@ def crop_image_and_text(page):
     thresh_kernel = np.ones((9, 9), np.uint8)
     dilated = cv2.erode(thresh, thresh_kernel, iterations=1)
 
-    (contours, _) = cv2.findContours(dilated.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    (_, contours, _) = cv2.findContours(dilated.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     max_area = 0
     max_box = None
@@ -71,7 +65,7 @@ def crop_image_and_text(page):
             continue
         if area > max_area:
             max_area = area
-            max_box = cv2.cv.BoxPoints(rect)
+            max_box = cv2.boxPoints(rect)
     max_box = np.int0(max_box)
 
     scan = utils.crop_rectangle_warp(orig, max_box.reshape(4, 2), ratio)
@@ -95,10 +89,11 @@ def crop_image_and_text(page):
     erode_k = np.ones((1, width), np.uint8)
     eroded = cv2.bitwise_not(cv2.erode(closed, erode_k, iterations=2))
 
-    lines = cv2.HoughLinesP(eroded.copy(), 1, np.pi / 180, 100, 5, 10)[0]
+    lines = cv2.HoughLinesP(eroded.copy(), 1, np.pi / 180, 100, 5, 10)
     # Filter out the vertical lines
-    h_lines = [line for line in lines if line[1] == line[3]]
-    h_lines = [line for line in h_lines if line[1] < eroded.shape[0] / 2]
+    h_lines = [line for line in lines if line[0][1] == line[0][3]]
+    # Filter out lines in the lower half of the page
+    h_lines = [line for line in h_lines if line[0][1] < eroded.shape[0] / 2]
 
     # Get lowest line
     lowest = get_y(sorted(h_lines, key=get_y, reverse=True)[0])

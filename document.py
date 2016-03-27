@@ -43,7 +43,7 @@ def crop_cardboard(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
-    (contours, _) = cv2.findContours(thresh.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    (_, contours, _) = cv2.findContours(thresh.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     max_area = 0
     max_box = None
@@ -53,7 +53,7 @@ def crop_cardboard(image):
         area = w * h
         if area > max_area:
             max_area = area
-            max_box = cv2.cv.BoxPoints(rect)
+            max_box = cv2.boxPoints(rect)
     max_box = np.int0(max_box)
 
     cardboard = utils.crop_rectangle_warp(orig, max_box.reshape(4, 2), ratio)
