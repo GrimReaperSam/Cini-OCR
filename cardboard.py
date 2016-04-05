@@ -43,26 +43,20 @@ def crop_image_and_text(page):
     dilated = cv2.erode(dilated, kernel, iterations=1)
 
     gray = cv2.cvtColor(dilated, cv2.COLOR_BGR2GRAY)
-    gray = cv2.GaussianBlur(gray, (11, 11), 0)
+    gray = cv2.medianBlur(gray, 7)
 
-    grad_x = cv2.Sobel(gray, ddepth=cv2.CV_32F, dx=1, dy=0, ksize=-1)
-    grad_x = cv2.convertScaleAbs(grad_x)
+    grad_x = cv2.Sobel(gray, ddepth=cv2.CV_32F, dx=1, dy=0, ksize=5)
     grad_x = cv2.pow(grad_x, 2)
 
-    grad_y = cv2.Sobel(gray, ddepth=cv2.CV_32F, dx=0, dy=1, ksize=-1)
-    grad_y = cv2.convertScaleAbs(grad_y)
+    grad_y = cv2.Sobel(gray, ddepth=cv2.CV_32F, dx=0, dy=1, ksize=5)
     grad_y = cv2.pow(grad_y, 2)
 
     grad = cv2.addWeighted(grad_x, 0.5, grad_y, 0.5, 0)
-    grad = cv2.pow(grad.astype("float32"), 0.5).astype("uint8")
 
-    blur = cv2.GaussianBlur(grad, (7, 7), 0)
-    _, thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    bina = (np.minimum(grad, 100000) > 50000) * 255
+    bina = bina.astype('uint8')
 
-    thresh_kernel = np.ones((9, 9), np.uint8)
-    dilated = cv2.erode(thresh, thresh_kernel, iterations=1)
-
-    (_, contours, _) = cv2.findContours(dilated.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    (_, contours, _) = cv2.findContours(bina.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     max_area = 0
     max_box = None
