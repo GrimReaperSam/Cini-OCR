@@ -3,11 +3,20 @@ import utils
 import numpy as np
 import warnings
 
-ACCEPTABLE_Y_RANGES = [(60, 80), (130, 140)]
+ACCEPTABLE_Y_RANGES = [(60, 80), (115, 140)]
 
 
 def get_y(line):
     return line[0][1]
+
+
+def validate_image_section(x, page_width):
+    page_mid_x = page_width / 2
+    acceptable_x_min = page_mid_x - 0.05 * page_width
+    acceptable_x_max = page_mid_x + 0.05 * page_width
+    if acceptable_x_min <= x <= acceptable_x_max:
+        return
+    warnings.warn('THIS IMAGE CROP IS WEIRD YO!')
 
 
 def validate_text_section(y_value):
@@ -57,18 +66,22 @@ def crop_image_and_text(page):
 
     max_area = 0
     max_box = None
+    max_x = None
     for contour in contours:
         rect = cv2.minAreaRect(contour)
-        (_, (h, w), _) = rect
+        ((x, _), (h, w), _) = rect
         area = w * h
         if h > 450 or w > page.shape[1] - 25:
             continue
         if area > max_area:
             max_area = area
+            max_x = x
             max_box = cv2.boxPoints(rect)
     max_box = np.int0(max_box)
 
     scan = utils.crop_rectangle_warp(orig, max_box.reshape(4, 2), ratio)
+
+    validate_image_section(max_x, page.shape[1])
 
     # -----------------------
     # Extracting text section
