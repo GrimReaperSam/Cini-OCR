@@ -31,19 +31,20 @@ def validate_text_section(y_value):
 
 def crop_image_and_text(page):
     width = page.shape[1]
-    ratio = page.shape[0] / 500.0
+    ratio = page.shape[0] / 1000.0
     orig = page.copy()
-    page = cv2.resize(page, (int(width / ratio), 500))
+    page = cv2.resize(page, (int(width / ratio), 1000))
 
     # -----------------------
     # Extracting image section
     # -----------------------
-    kernel = np.ones((3, 3), np.uint8)
+    kernel = np.ones((15, 15), np.uint8)
     dilated = cv2.dilate(page, kernel, iterations=1)
-    dilated = cv2.erode(dilated, kernel, iterations=1)
+    erokernel = np.ones((11, 11), np.uint8)
+    dilated = cv2.erode(dilated, erokernel, iterations=1)
 
     gray = cv2.cvtColor(dilated, cv2.COLOR_BGR2GRAY)
-    gray = cv2.medianBlur(gray, 7)
+    gray = cv2.GaussianBlur(gray, (15, 15), 0)
 
     grad_x = cv2.Sobel(gray, ddepth=cv2.CV_32F, dx=1, dy=0, ksize=5)
     grad_x = cv2.pow(grad_x, 2)
@@ -52,9 +53,10 @@ def crop_image_and_text(page):
     grad_y = cv2.pow(grad_y, 2)
 
     grad = cv2.addWeighted(grad_x, 0.5, grad_y, 0.5, 0)
+    grad = cv2.pow(grad.astype("float32"), 0.5).astype('uint8')
 
-    bina = (np.minimum(grad, 100000) > 50000) * 255
-    bina = bina.astype('uint8')
+    blur = cv2.GaussianBlur(grad, (7, 7), 0)
+    _, bina = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
     (_, contours, _) = cv2.findContours(bina.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -65,7 +67,7 @@ def crop_image_and_text(page):
         rect = cv2.minAreaRect(contour)
         ((x, _), (h, w), _) = rect
         area = w * h
-        if h > 450 or w > page.shape[1] - 25:
+        if h > 900 or w > page.shape[1] - 50:
             continue
         if area > max_area:
             max_area = area
