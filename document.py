@@ -2,15 +2,7 @@ import cv2
 import utils
 import numpy as np
 import warnings
-
-CARDBOARD_MIN_WIDTH = 4550
-CARDBOARD_MAX_WIDTH = 4650
-
-CARDBOARD_MIN_HEIGHT = 5100
-CARDBOARD_MAX_HEIGHT = 5250
-
-CARDBOARD_MIN_RATIO = 1.11
-CARDBOARD_MAX_RATIO = 1.14
+from shared import *
 
 
 def validate_width(width):

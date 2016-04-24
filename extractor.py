@@ -34,11 +34,3 @@ def extract(cv2image):
         text = text.split('\n', 1)[0]
         texts.append(text)
     return texts
-
-# from asprise_ocr_api import *
-#
-# Ocr.set_up() # one time setup
-# ocrEngine = Ocr()
-# ocrEngine.start_engine("eng")
-# s = ocrEngine.recognize("test-image.png", -1, -1, -1, -1, -1,
-#                   OCR_RECOGNIZE_TYPE_ALL, OCR_OUTPUT_FORMAT_PLAINTEXT)

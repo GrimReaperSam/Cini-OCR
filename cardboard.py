@@ -2,12 +2,7 @@ import cv2
 import utils
 import numpy as np
 import warnings
-
-ACCEPTABLE_TEXT_SECTIONS_Y_RANGES = [(120, 160), (230, 280)]
-RESIZE_HEIGHT = 1000.0
-IMAGE_HEIGHT_LIMIT = 0.9 * RESIZE_HEIGHT
-IMAGE_WIDTH_DELIMITER = 0.05 * RESIZE_HEIGHT
-IMAGE_MASK_BORDER_WIDTH = 15
+from shared import *
 
 
 def get_y(line):
