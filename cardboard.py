@@ -3,7 +3,11 @@ import utils
 import numpy as np
 import warnings
 
-ACCEPTABLE_Y_RANGES = [(60, 80), (115, 140)]
+ACCEPTABLE_TEXT_SECTIONS_Y_RANGES = [(120, 160), (230, 280)]
+RESIZE_HEIGHT = 1000.0
+IMAGE_HEIGHT_LIMIT = 0.9 * RESIZE_HEIGHT
+IMAGE_WIDTH_DELIMITER = 0.05 * RESIZE_HEIGHT
+IMAGE_MASK_BORDER_WIDTH = 15
 
 
 def get_y(line):
@@ -21,7 +25,7 @@ def validate_image_section(x, page_width):
 
 def validate_text_section(y_value):
     valid = False
-    for (mini, maxi) in ACCEPTABLE_Y_RANGES:
+    for (mini, maxi) in ACCEPTABLE_TEXT_SECTIONS_Y_RANGES:
         if mini <= y_value <= maxi:
             valid = True
             break
@@ -29,11 +33,11 @@ def validate_text_section(y_value):
         warnings.warn('THIS TEXT SECTION IS WEIRD YO!')
 
 
-def crop_image_and_text(page):
-    width = page.shape[1]
-    ratio = page.shape[0] / 1000.0
-    orig = page.copy()
-    page = cv2.resize(page, (int(width / ratio), 1000))
+def crop_image_and_text(document):
+    width = document.shape[1]
+    ratio = document.shape[0] / RESIZE_HEIGHT
+    orig = document.copy()
+    page = cv2.resize(document, (int(width / ratio), int(RESIZE_HEIGHT)))
 
     # -----------------------
     # Extracting image section
@@ -67,7 +71,7 @@ def crop_image_and_text(page):
         rect = cv2.minAreaRect(contour)
         ((x, _), (h, w), _) = rect
         area = w * h
-        if h > 900 or w > page.shape[1] - 50:
+        if h > IMAGE_HEIGHT_LIMIT or w > page.shape[1] - IMAGE_WIDTH_DELIMITER:
             continue
         if area > max_area:
             max_area = area
@@ -90,7 +94,7 @@ def crop_image_and_text(page):
     # Remove the image region
     cv2.drawContours(th_gray, [max_box], -1, (255, 255, 255), -1)
     # Remove a bit around the image (Artifacts from dilation)
-    cv2.drawContours(th_gray, [max_box], -1, (255, 255, 255), 10)
+    cv2.drawContours(th_gray, [max_box], -1, (255, 255, 255), IMAGE_MASK_BORDER_WIDTH)
     # Remove noisy artifacts
     closed = cv2.dilate(th_gray, horizontal_k, iterations=12)
 
