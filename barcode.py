@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 import zbarlight
 from PIL import Image
+from kraken import binarization
 import utils
 
 HEIGHT_RESIZE = 2000.0
@@ -24,7 +25,7 @@ def detect(page):
     blurred = cv2.blur(grad, (9, 9))
     _, thresh = cv2.threshold(blurred, 180, 255, cv2.THRESH_BINARY)
 
-    k = cv2.getStructuringElement(cv2.MORPH_RECT, (21, 7))
+    k = cv2.getStructuringElement(cv2.MORPH_RECT, (21, 1))
     close = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, k)
 
     eroded = cv2.erode(close, None, iterations=4)
@@ -43,7 +44,8 @@ def detect(page):
 
 
 def _read(cv2_image):
-    codes = zbarlight.scan_codes('code39', Image.fromarray(cv2_image))
+    barcode_binary = binarization.nlbin(Image.fromarray(cv2_image), zoom=1.0)
+    codes = zbarlight.scan_codes('code39', barcode_binary)
     if codes:
         return codes[0].decode('utf-8')
     return ''
