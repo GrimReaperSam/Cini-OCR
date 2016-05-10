@@ -22,6 +22,7 @@ ap.add_argument("-s", "--skip-processed", required=False, default=False, help="S
 args = vars(ap.parse_args())
 
 working_dir = os.getcwd()
+skip_processed = args['skip_processed']
 
 raws_path = args['raws']
 raws_folder = os.path.join(working_dir, raws_path)
@@ -33,12 +34,21 @@ destination_folder = os.path.join(working_dir, destination_path)
 if not os.path.exists(destination_folder):
     os.makedirs(destination_folder)
 
+processed_images = []
+log_file = os.path.join(destination_folder, VISITED_LOG_FILE_NAME)
+if os.path.exists(log_file):
+    with open(log_file, 'r') as f:
+        processed_images = [line.rstrip('\n') for line in f]
+
 for filename in sorted(os.listdir(raws_folder)):
     recto = RECTO_SUBSTRING in filename
     if not recto:
         continue
     name = re.sub(RECTO_SUBSTRING, '', filename)
     name = re.sub('_', '', name)
+
+    if name in processed_images and skip_processed:
+        continue
 
     current_folder = os.path.join(destination_folder, name)
     if not os.path.exists(current_folder):
@@ -64,9 +74,14 @@ for filename in sorted(os.listdir(raws_folder)):
     im_info = Info(barcode.detect(page))
     pretty_json = json.dumps(json.loads(jsonpickle.encode(im_info)), indent=4, sort_keys=True)
 
-    f = open(os.path.join(current_folder, 'info.json'), 'w')
-    f.write(pretty_json)
-    f.close()
+    with open(os.path.join(current_folder, 'info.json'), 'w') as f:
+        f.write(pretty_json)
 
-    print("End processing image %s" % filename)
+    if name not in processed_images:
+        processed_images.append(name)
+
+        with open(log_file, 'a') as f:
+            f.write(name + '\n')
+
+    print("End processing image %s" % name)
     print()

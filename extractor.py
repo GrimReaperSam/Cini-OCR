@@ -38,7 +38,7 @@ def extract(cv2image):
 
 def bound_image(cv2image):
     binary = _binarize(cv2image)
-    rbounds, boxes = _segment(binary)
+    rbounds, _ = _segment(binary)
     bounds = list(rbounds)
     count = len(bounds)
     common = []
@@ -67,6 +67,7 @@ def bound_image(cv2image):
     for i in sorted(indices, reverse=True):
         del bounds[i]
 
+    boxes = []
     for x1, y1, x2, y2 in bounds:
         mid = ((x1 + x2) / 2, (y1 + y2) / 2)
         # Adding 10 to grow borders a bit
