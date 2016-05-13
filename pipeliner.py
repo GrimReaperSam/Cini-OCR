@@ -1,7 +1,7 @@
 import argparse
 import json
 import jsonpickle
-import os
+from pathlib import Path
 import re
 
 import cv2
@@ -21,26 +21,40 @@ ap.add_argument("-d", "--destination", required=True,
 ap.add_argument("-s", "--skip-processed", required=False, default=False, help="Skips already processed images")
 args = vars(ap.parse_args())
 
-working_dir = os.getcwd()
 skip_processed = args['skip_processed']
 
+##################################################
+# Getting raws folder and checking for existence #
+##################################################
 raws_path = args['raws']
-raws_folder = os.path.join(working_dir, raws_path)
-if not os.path.exists(raws_folder):
+raws_folder = Path(raws_path)
+if not raws_folder.exists():
     raise Exception("Raws folder not found under %s" % raws_folder)
+raws_folder = raws_folder.resolve()
 
+#############################################
+# Getting destination folder or creating it #
+#############################################
 destination_path = args['destination']
-destination_folder = os.path.join(working_dir, destination_path)
-if not os.path.exists(destination_folder):
-    os.makedirs(destination_folder)
+destination_folder = Path(destination_path)
+if not destination_folder.exists():
+    destination_folder.mkdir()
+destination_folder = destination_folder.resolve()
 
+####################
+# Reading Log File #
+####################
 processed_images = []
-log_file = os.path.join(destination_folder, VISITED_LOG_FILE_NAME)
-if os.path.exists(log_file):
-    with open(log_file, 'r') as f:
+log_file = destination_folder / VISITED_LOG_FILE_NAME
+if log_file.exists():
+    with log_file.open() as f:
         processed_images = [line.rstrip('\n') for line in f]
 
-for filename in sorted(os.listdir(raws_folder)):
+##########################
+# Looping over raw scans #
+##########################
+for file in sorted([x for x in raws_folder.iterdir()]):
+    filename = file.name
     recto = RECTO_SUBSTRING in filename
     if not recto:
         continue
@@ -50,37 +64,41 @@ for filename in sorted(os.listdir(raws_folder)):
     if name in processed_images and skip_processed:
         continue
 
-    current_folder = os.path.join(destination_folder, name)
-    if not os.path.exists(current_folder):
-        os.makedirs(current_folder)
+    current_folder = destination_folder / name
+    if not current_folder.exists():
+        current_folder.mkdir()
 
     print("Begin processing image %s" % name)
 
-    # RECTO PROCESSING
-    image = raw_converter.to_cv2("samples/%s" % filename)
+    ####################
+    # RECTO PROCESSING #
+    ####################
+    image = raw_converter.to_cv2(str(file))
     page = document.crop_cardboard(image)
-    image = None
-    cv2.imwrite(os.path.join(current_folder, 'cardboard-re.png'), page)
+    cv2.imwrite(str(current_folder / 'cardboard-re.png'), page)
     crop, text_section = cardboard.crop_image_and_text(page)
-    cv2.imwrite(os.path.join(current_folder, 'image.png'), crop)
-    cv2.imwrite(os.path.join(current_folder, 'text-section.png'), text_section)
+    cv2.imwrite(str(current_folder / 'image.png'), crop)
+    cv2.imwrite(str(current_folder / 'text-section.png'), text_section)
 
-    # VERSO PROCESSING
-    verso_name = re.sub(RECTO_SUBSTRING, VERSO_SUBSTRING, filename)
-    image = raw_converter.to_cv2("samples/%s" % verso_name)
+    ####################
+    # VERSO PROCESSING #
+    ####################
+    verso_name = re.sub(RECTO_SUBSTRING, VERSO_SUBSTRING, str(file))
+    image = raw_converter.to_cv2(verso_name)
     page = document.crop_cardboard(image)
-    image = None
-    cv2.imwrite(os.path.join(current_folder, 'cardboard-ve.png'), page)
+    cv2.imwrite(str(current_folder / 'cardboard-ve.png'), page)
     im_info = Info(barcode.detect(page))
     pretty_json = json.dumps(json.loads(jsonpickle.encode(im_info)), indent=4, sort_keys=True)
-
-    with open(os.path.join(current_folder, 'info.json'), 'w') as f:
+    with (current_folder / 'info.json').open('w') as f:
         f.write(pretty_json)
 
+    ######################
+    # Saving to log file #
+    ######################
     if name not in processed_images:
         processed_images.append(name)
 
-        with open(log_file, 'a') as f:
+        with log_file.open('a') as f:
             f.write(name + '\n')
 
     print("End processing image %s" % name)
