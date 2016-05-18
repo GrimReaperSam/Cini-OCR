@@ -175,6 +175,7 @@ dependencies:
   - jupyter-core==4.1.0
   - kraken==0.7.6
   - protobuf==3.0.0a3
+  - pytesseract==0.1.6
   - rawkit==0.5.0
   - regex==2016.5.15
   - rope-py3k==0.9.4.post1
