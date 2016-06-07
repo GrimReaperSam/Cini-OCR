@@ -31,6 +31,7 @@ The arguments are:
  * '-r' Raws directory
  * '-d' Destination directory
  * '-s' Skip processed
+Example: python pipeliner.py -r 'samples' -d 'destination' -s True
 
 Project Structure
 -----------------
