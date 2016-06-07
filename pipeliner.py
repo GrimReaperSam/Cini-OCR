@@ -10,6 +10,7 @@ import barcode
 import cardboard
 import document
 import raw_converter
+import extractor
 from info import Info
 from shared import *
 
@@ -79,6 +80,7 @@ for file in sorted([x for x in raws_folder.iterdir()]):
     crop, text_section = cardboard.crop_image_and_text(page)
     cv2.imwrite(str(current_folder / 'image.png'), crop)
     cv2.imwrite(str(current_folder / 'text-section.png'), text_section)
+    text_bounds = extractor.text_bounds(text_section)
 
     ####################
     # VERSO PROCESSING #
@@ -87,9 +89,9 @@ for file in sorted([x for x in raws_folder.iterdir()]):
     image = raw_converter.to_cv2(verso_name)
     page = document.crop_cardboard(image)
     cv2.imwrite(str(current_folder / 'cardboard-ve.png'), page)
-    im_info = Info(barcode.detect(page))
-    pretty_json = json.dumps(json.loads(jsonpickle.encode(im_info)), indent=4, sort_keys=True)
-    with (current_folder / 'info.json').open('w') as f:
+    im_info = Info(barcode.detect(page), text_bounds)
+    pretty_json = json.dumps(json.loads(jsonpickle.encode(im_info, unpicklable=False)), indent=4, sort_keys=True)
+    with (current_folder / ("%s-fronte.json" % im_info.barcode)).open('w') as f:
         f.write(pretty_json)
 
     ######################

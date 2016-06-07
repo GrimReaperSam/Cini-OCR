@@ -15,7 +15,7 @@ def validate_image_section(x, page_width):
     acceptable_x_max = page_mid_x + 0.05 * page_width
     if acceptable_x_min <= x <= acceptable_x_max:
         return
-    warnings.warn('THIS IMAGE CROP IS WEIRD YO!')
+    warnings.warn("The image crop isn't horizontally centered")
 
 
 def validate_text_section(y_value):

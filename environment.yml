@@ -86,7 +86,6 @@ dependencies:
 - numexpr=2.5=np110py35_0
 - numpy=1.10.4=py35_1
 - odo=0.4.2=py35_0
-- opencv3=3.1.0=py35_0
 - openpyxl=2.3.2=py35_0
 - openssl=1.0.2g=0
 - pandas=0.18.0=np110py35_0
@@ -176,7 +175,6 @@ dependencies:
   - kraken==0.7.6
   - protobuf==3.0.0a3
   - pytesseract==0.1.6
-  - rawkit==0.5.0
   - regex==2016.5.15
   - rope-py3k==0.9.4.post1
   - sphinx-rtd-theme==0.1.9

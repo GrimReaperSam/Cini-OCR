@@ -3,6 +3,8 @@ import cv2
 from kraken import binarization, pageseg
 from PIL import Image
 import pytesseract
+
+import FrangiFilter
 import utils
 
 
@@ -74,3 +76,65 @@ def bound_image(cv2image):
         rect = (mid, (x2 - x1 + 10, y2 - y1 + 10), 0)
         boxes.append(np.int0(cv2.boxPoints(rect)))
     return boxes
+
+
+def text_bounds(cv2image):
+    binary = _binarize(cv2image)
+
+    RESIZE_HEIGHT = 500.0
+    npbin = np.asarray(binary)
+    width = npbin.shape[1]
+    ratio = npbin.shape[0] / RESIZE_HEIGHT
+    npbin = cv2.resize(npbin, (int(width / ratio), int(RESIZE_HEIGHT)))
+
+    kernel = np.ones((5, 5), np.uint8)
+    ppbin = cv2.erode(npbin, kernel, iterations=1)
+
+    frf = FrangiFilter.FrangiFilter2D(ppbin, FrangiScaleRange=np.array([3, 4]))
+    binnn = (frf < 0.01).astype('uint8')
+
+    dilated = cv2.morphologyEx(binnn, cv2.MORPH_OPEN, kernel)
+
+    (_, contours, hierarchy) = cv2.findContours(dilated.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    rects = [cv2.minAreaRect(cnt) for cnt in contours]
+    boxs = [np.int0(cv2.boxPoints(rt)) for rt in rects if rt[1][0] > 50 and rt[1][1] > 50]
+
+    boxsr = [np.int0(box * ratio) for box in boxs]
+    boxsr = [np.int0(utils.abcd_rect(box)) for box in boxsr]
+
+    im_bounds = bound_image(cv2image)
+
+    text_boundaries = []
+
+    for bb in im_bounds:
+        inside = False
+        my_area = None
+
+        current = utils.crop_rectangle_warp(cv2image, bb.reshape(4, 2), 1)
+        text = pytesseract.image_to_string(Image.fromarray(current))
+        text = text.split('\n', 1)[0]
+        for area in boxsr:
+            if is_inside(bb, area):
+                inside = True
+                my_area = area
+        if inside:
+            text_boundaries.append(TextBound(text, bb.tolist(), my_area.tolist()))
+        else:
+            text_boundaries.append(TextBound(text, bb.tolist()))
+    return text_boundaries
+
+
+def is_inside(box, area):
+    if box[0][0] > area[0][0] and box[0][1] > area[0][1]:
+        if box[2][0] < area[2][0] and box[2][1] < area[2][1]:
+            return True
+    return False
+
+
+class TextBound(object):
+    def __init__(self, text, text_bound, area_bound=None):
+        self.text = text
+        self.text_bound = text_bound
+        self.area_bound = area_bound
+        if area_bound is None:
+            self.warning = True
