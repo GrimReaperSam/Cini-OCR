@@ -11,8 +11,13 @@ import cardboard
 import document
 import raw_converter
 import extractor
-from info import Info
 from shared import *
+
+
+class Info(object):
+    def __init__(self, bar_code, bounds):
+        self.bar_code = bar_code
+        self.bounds = bounds
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-r", "--raws", required=True,
@@ -91,7 +96,7 @@ for file in sorted([x for x in raws_folder.iterdir()]):
     cv2.imwrite(str(current_folder / 'cardboard-ve.png'), page)
     im_info = Info(barcode.detect(page), text_bounds)
     pretty_json = json.dumps(json.loads(jsonpickle.encode(im_info, unpicklable=False)), indent=4, sort_keys=True)
-    with (current_folder / ("%s-fronte.json" % im_info.barcode)).open('w') as f:
+    with (current_folder / ("%s-fronte.json" % im_info.bar_code)).open('w') as f:
         f.write(pretty_json)
 
     ######################
@@ -105,3 +110,4 @@ for file in sorted([x for x in raws_folder.iterdir()]):
 
     print("End processing image %s" % name)
     print()
+
