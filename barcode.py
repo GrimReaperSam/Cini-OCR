@@ -9,6 +9,11 @@ HEIGHT_RESIZE = 2000.0
 
 
 def detect(page):
+    """
+        Given a verso page detects the existence of a barcode and returns its value,
+        otherwise an empty string.
+        :param page: A verso cardboard
+    """
     width = page.shape[1]
     ratio = page.shape[0] / HEIGHT_RESIZE
     orig = page.copy()

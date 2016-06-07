@@ -26,19 +26,11 @@ def _segment(pil_image):
     return bounds, boxes
 
 
-def extract(cv2image):
-    binary = _binarize(cv2image)
-    boxes = _segment(binary)
-    texts = list()
-    for box in boxes:
-        current = utils.crop_rectangle_warp(cv2image, box.reshape(4, 2), 1)
-        text = pytesseract.image_to_string(Image.fromarray(current))
-        text = text.split('\n', 1)[0]
-        texts.append(text)
-    return texts
-
-
 def bound_image(cv2image):
+    """
+    :param cv2image: Numpy array representing the text section of the cardboard
+    :return: The detected regions that might contain text according to the kraken page segmenter
+    """
     binary = _binarize(cv2image)
     rbounds, _ = _segment(binary)
     bounds = list(rbounds)
@@ -79,6 +71,10 @@ def bound_image(cv2image):
 
 
 def text_bounds(cv2image):
+    """
+    :param cv2image: Numpy array representing the text section of the cardboard
+    :return: A list of text bounds containing the extracted text, its location and its surrounding area if possible
+    """
     binary = _binarize(cv2image)
 
     RESIZE_HEIGHT = 500.0

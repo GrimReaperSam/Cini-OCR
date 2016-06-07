@@ -38,6 +38,7 @@ Project Structure
  
 The main files in the project are the following:
  * shared.py: Contains some shared constants
+ * utils.py: Contains some shared utility functions
  * raw_converter.py: Converts a RAW CR2 file into a numpy array
  * document.py: Detects the cardboard inside the image and crops it out
  * cardboard.py: Detects the painting and the text section inside the cardboard and crops them out

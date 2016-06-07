@@ -28,6 +28,10 @@ def validate_cardboard(cardboard):
 
 
 def crop_cardboard(image):
+    """
+    :param image: A numpy array representing the full scanned document extracted from the RAW file
+    :return: A subsection of the document representing the cardboard only
+    """
     ratio = image.shape[0] / 500.0
     orig = image.copy()
     image = cv2.resize(image, (int(image.shape[1]/ratio), 500))

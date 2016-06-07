@@ -29,6 +29,11 @@ def validate_text_section(y_value):
 
 
 def crop_image_and_text(document):
+    """
+    Given a recto cardboard, detects the painting and the text sections and crops them
+    :param document: A recto cardboard
+    :return: The painting and the text section as numpy arrays
+    """
     width = document.shape[1]
     ratio = document.shape[0] / RESIZE_HEIGHT
     orig = document.copy()
