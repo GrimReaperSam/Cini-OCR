@@ -21,6 +21,9 @@ Cloning the project and installing the dependencies
  * conda env create -f environment.yml
  * conda install -n OCR -c menpo opencv3=3.1.0 (OCR is the name of the virtual env)
  * conda install -n OCR -c atanahel rawkit=0.5.0
+
+Running
+-------
  
 To run you can use the following command:
  * python pipeliner.py
@@ -28,6 +31,9 @@ The arguments are:
  * '-r' Raws directory
  * '-d' Destination directory
  * '-s' Skip processed
+
+Project Structure
+-----------------
  
 The main files in the project are the following:
  * shared.py: Contains some shared constants
