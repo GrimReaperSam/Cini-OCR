@@ -12,9 +12,7 @@ Downloading C libraries (`apt-get install` or equivalent):
  
 Downloading anaconda:
  * `wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh`
- * `bash Miniconda3-latest-Linux-x86_64.sh`
-If you want a different version go to https://www.continuum.io/downloads 
-and download from there
+ * `bash Miniconda3-latest-Linux-x86_64.sh` Say yes to PATH export at the end of installation
 
 Cloning the project and installing the dependencies
  * `git clone https://github.com/GrimReaperSam/Cini-OCR.git`
@@ -22,7 +20,9 @@ Cloning the project and installing the dependencies
  * `conda config --add channels https://conda.anaconda.org/menpo`
  * `conda config --add channels https://conda.anaconda.org/Atanahel`
  * `conda env create -f environment.yml` creates the virtual environment called OCR
- * `source activate OCR` for activating the virtual environment (necessary every time you restart a terminal)
+
+Then every time you open a shell to use the program :
+ * `source activate OCR` for activating the virtual environment
 
 Running
 -------
