@@ -12,22 +12,23 @@ Downloading C libraries (`apt-get install` or equivalent):
  
 Downloading anaconda:
  * `wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh`
- * `bash Miniconda3-latest-Linux-x86_64.sh` Say yes to PATH export at the end of installation
+ * `bash Miniconda3-latest-Linux-x86_64.sh` Say yes to PATH export in `.bashrc` at the end of installation.
+ * Reload `.bashrc` with `source .bashrc` or close-open terminal.
 
 Cloning the project and installing the dependencies
  * `git clone https://github.com/GrimReaperSam/Cini-OCR.git`
  * `cd Cini-OCR`
  * `conda config --add channels https://conda.anaconda.org/menpo`
  * `conda config --add channels https://conda.anaconda.org/Atanahel`
- * `conda env create -f environment.yml` creates the virtual environment called OCR
-
-Then every time you open a shell to use the program :
- * `source activate OCR` for activating the virtual environment
+ * `conda env create -f environment.yml` creates the virtual environment called OCR with all the dependencies necessary.
 
 Running
 -------
  
-To run you can use the following command:
+Every time you open a new shell you have to activate the virutal environment :
+ * `source activate OCR` (_Note : you can add this line to the `.bashrc` instead of running it every new shell_)
+
+To run the program,you can use the following command:
  * `python pipeline.py`
 
 The arguments are:
@@ -35,7 +36,7 @@ The arguments are:
  * '-d' Destination directory
  * '-s' Skip processed
 
-Example: `python pipeline.py -r 'samples' -d 'destination' -s True`
+**Example:** `python pipeline.py -r 'samples' -d 'destination' -s True`
 
 Project Structure
 -----------------
