@@ -62,6 +62,7 @@ dependencies:
 - libffi=3.0.13=0
 - libgfortran=3.0=0
 - libpng=1.6.17=0
+- libraw=0.17.2=2
 - libsodium=1.0.3=0
 - libtiff=4.0.6=1
 - libxml2=2.9.2=0
@@ -86,6 +87,7 @@ dependencies:
 - numexpr=2.5=np110py35_0
 - numpy=1.10.4=py35_1
 - odo=0.4.2=py35_0
+- opencv3=3.1.0=py35_0
 - openpyxl=2.3.2=py35_0
 - openssl=1.0.2g=0
 - pandas=0.18.0=np110py35_0
@@ -123,6 +125,7 @@ dependencies:
 - qtawesome=0.3.2=py35_0
 - qtconsole=4.2.0=py35_0
 - qtpy=1.0=py35_0
+- rawkit=0.5.0=py35_2
 - readline=6.2=2
 - redis=2.6.9=0
 - redis-py=2.10.3=py35_0
