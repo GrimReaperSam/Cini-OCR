@@ -27,14 +27,14 @@ Running
 -------
  
 To run you can use the following command:
- * `python pipeliner.py`
+ * `python pipeline.py`
 
 The arguments are:
  * '-r' Raws directory
  * '-d' Destination directory
  * '-s' Skip processed
 
-Example: `python pipeliner.py -r 'samples' -d 'destination' -s True`
+Example: `python pipeline.py -r 'samples' -d 'destination' -s True`
 
 Project Structure
 -----------------
