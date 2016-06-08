@@ -4,24 +4,25 @@ CINI OCR
 This project aims at digitizing various scanned documents retrieved from the Cini foundation.
 The goal is to segment the scans, find the the paintings and text areas inside them, and later be able to extract the text.
 
-Installation
+Installation (Tested on Ubuntu 14.04, should work on other Ubuntu version)
 ------------
 
 Downloading C libraries (`apt-get install` or equivalent): 
- * libzbar-dev, libzbar0
+ * libzbar-dev, libzbar0, tesseract-ocr (`apt-get install libzbar-dev libzbar0 tesseract-ocr`)
  
 Downloading anaconda:
- * `wget http://repo.continuum.io/archive/Anaconda3-4.0.0-Linux-x86_64.sh`
- * `bash Anaconda3-4.0.0-Linux-x86_64.sh`
-If you want a different version go to https://www.continuum.io/downloads 
-and download from there
+ * `wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh`
+ * `bash Miniconda3-latest-Linux-x86_64.sh` Say yes to PATH export at the end of installation
 
 Cloning the project and installing the dependencies
  * `git clone https://github.com/GrimReaperSam/Cini-OCR.git`
+ * `cd Cini-OCR`
  * `conda config --add channels https://conda.anaconda.org/menpo`
  * `conda config --add channels https://conda.anaconda.org/Atanahel`
  * `conda env create -f environment.yml` creates the virtual environment called OCR
- * `source activate OCR` for activating the virtual environment (necessary every time you restart a terminal)
+
+Then every time you open a shell to use the program :
+ * `source activate OCR` for activating the virtual environment
 
 Running
 -------
