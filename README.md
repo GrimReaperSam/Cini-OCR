@@ -18,10 +18,10 @@ and download from there
 
 Cloning the project and installing the dependencies
  * `git clone https://github.com/GrimReaperSam/Cini-OCR.git`
+ * `conda config --add channels https://conda.anaconda.org/menpo`
+ * `conda config --add channels https://conda.anaconda.org/Atanahel`
  * `conda env create -f environment.yml` creates the virtual environment called OCR
  * `source activate OCR` for activating the virtual environment (necessary every time you restart a terminal)
- * `conda install -n OCR -c menpo opencv3=3.1.0`
- * `conda install -n OCR -c atanahel rawkit=0.5.0`
 
 Running
 -------
