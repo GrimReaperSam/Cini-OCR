@@ -28,15 +28,14 @@ def bound_image(cv2image):
         for j in range(i + 1, count):
             rect_a = bounds[i]
             rect_b = bounds[j]
-            if abs(rect_a[0] - rect_b[0]) < 0.03 * cv2image.shape[1]:
-                if abs(rect_a[3] - rect_b[1]) < 0.03 * cv2image.shape[0]:
-                    common.append((i, j))
+            # TODO Fix merging algorithm
+            if abs(rect_a[0] - rect_b[0]) < 0.03 * cv2image.shape[1] and abs(rect_a[3] - rect_b[1]) < 0.03 * cv2image.shape[0]:
+                common.append((i, j))
 
-            if abs(rect_a[1] - rect_b[1]) < 0.03 * cv2image.shape[0]:
-                if abs(rect_a[2] - rect_b[0]) < 0.03 * cv2image.shape[1]:
-                    common.append((i, j))
+            elif abs(rect_a[1] - rect_b[1]) < 0.03 * cv2image.shape[0] and abs(rect_a[2] - rect_b[0]) < 0.03 * cv2image.shape[1]:
+                common.append((i, j))
 
-            if rect_a[0] < rect_b[2] and rect_a[2] > rect_b[0] and rect_a[1] < rect_b[3] and rect_a[3] > rect_b[1]:
+            elif rect_a[0] < rect_b[2] and rect_a[2] > rect_b[0] and rect_a[1] < rect_b[3] and rect_a[3] > rect_b[1]:
                 common.append((i, j))
 
     for (f, s) in common:
@@ -66,10 +65,10 @@ def text_bounds(cv2image):
     binary = _binarize(cv2image)
 
     RESIZE_HEIGHT = 500.0
-    npbin = np.asarray(binary)
-    width = npbin.shape[1]
-    ratio = npbin.shape[0] / RESIZE_HEIGHT
-    npbin = cv2.resize(npbin, (int(width / ratio), int(RESIZE_HEIGHT)))
+    orig = np.asarray(binary)
+    width = orig.shape[1]
+    ratio = orig.shape[0] / RESIZE_HEIGHT
+    npbin = cv2.resize(orig, (int(width / ratio), int(RESIZE_HEIGHT)))
 
     kernel = np.ones((5, 5), np.uint8)
     ppbin = cv2.erode(npbin, kernel, iterations=1)
@@ -94,7 +93,7 @@ def text_bounds(cv2image):
         inside = False
         my_area = None
 
-        current = utils.crop_rectangle_warp(cv2image, bb.reshape(4, 2), 1)
+        current = utils.crop_rectangle_warp(orig, bb.reshape(4, 2), 1)
         text = pytesseract.image_to_string(Image.fromarray(current))
         text = text.split('\n', 1)[0]
         for area in boxsr:
