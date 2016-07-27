@@ -25,7 +25,7 @@ def validate_text_section(y_value):
             valid = True
             break
     if not valid:
-        warnings.warn("The height of this text section is not usual")
+        warnings.warn("The height of this text section is not usual : {}".format(y_value))
 
 
 def crop_image_and_text(document):
