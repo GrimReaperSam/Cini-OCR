@@ -1,11 +1,23 @@
-import numpy as np
 import cv2
-from kraken import binarization, pageseg
-from PIL import Image
+import numpy as np
 import pytesseract
+from PIL import Image
+from kraken import binarization, pageseg
 
-import FrangiFilter
-import utils
+from ciniocr.document_analysis import frangi_filter
+from ciniocr import utils
+
+
+class TextBound(object):
+    def __init__(self, text, text_bound, area_bound=None):
+        self.text = text
+        self.text_bound = text_bound
+        self.area_bound = area_bound
+        if area_bound is None:
+            self.warning = True
+
+    def __repr__(self):
+        return 'TextBound({})'.format(self.text)
 
 
 # Returns PIL Image
@@ -73,7 +85,7 @@ def text_bounds(cv2image):
     kernel = np.ones((5, 5), np.uint8)
     ppbin = cv2.erode(npbin, kernel, iterations=1)
 
-    frf = FrangiFilter.FrangiFilter2D(ppbin, FrangiScaleRange=np.array([3, 4]))
+    frf = frangi_filter.frangi_filter_2d(ppbin, FrangiScaleRange=np.array([3, 4]))
     binnn = (frf < 0.01).astype('uint8')
 
     dilated = cv2.morphologyEx(binnn, cv2.MORPH_OPEN, kernel)
@@ -113,11 +125,3 @@ def is_inside(box, area):
             return True
     return False
 
-
-class TextBound(object):
-    def __init__(self, text, text_bound, area_bound=None):
-        self.text = text
-        self.text_bound = text_bound
-        self.area_bound = area_bound
-        if area_bound is None:
-            self.warning = True

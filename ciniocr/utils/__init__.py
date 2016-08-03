@@ -1,3 +1,4 @@
+from rawkit.raw import Raw
 import numpy as np
 import cv2
 
@@ -52,3 +53,28 @@ def crop_rectangle_warp(image, rect_coords, ratio, amount=0):
 
     warp_matrix = cv2.getPerspectiveTransform(orig_rect, dest_rect)
     return cv2.warpPerspective(image, warp_matrix, (w, h))
+
+
+def load_raw_file_to_cv2(filename):
+    """
+    Load a Raw file
+    :param filename:
+    :return:
+    """
+    with Raw(filename=filename) as raw:
+        raw.options.rotation = 0
+        w = raw.data.contents.sizes.width
+        h = raw.data.contents.sizes.height
+        na = np.frombuffer(raw.to_buffer(), np.int8)
+        na = na.reshape(h, w, 3).astype("uint8")
+        return cv2.cvtColor(na, cv2.COLOR_BGR2RGB)
+
+
+def get_enclosing_contours(binary):
+    _, contours, hierarchy = cv2.findContours(binary.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    results = []
+    if len(contours)>0:
+        for cnt, h in zip(contours, hierarchy[0]):
+            if h[3] < 0:
+                results.append(cnt)
+    return results

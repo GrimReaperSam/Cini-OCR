@@ -1,31 +1,12 @@
 import cv2
-import utils
 import numpy as np
 import warnings
-from shared import *
+from ciniocr import utils
+from ciniocr.shared import *
 
 
 def get_y(line):
     return line[0][1]
-
-
-def validate_image_section(x, page_width):
-    page_mid_x = page_width / 2
-    acceptable_x_min = page_mid_x - 0.05 * page_width
-    acceptable_x_max = page_mid_x + 0.05 * page_width
-    if acceptable_x_min <= x <= acceptable_x_max:
-        return
-    warnings.warn("The image crop isn't horizontally centered")
-
-
-def validate_text_section(y_value):
-    valid = False
-    for (mini, maxi) in ACCEPTABLE_TEXT_SECTIONS_Y_RANGES:
-        if mini <= y_value <= maxi:
-            valid = True
-            break
-    if not valid:
-        warnings.warn("The height of this text section is not usual : {}".format(y_value))
 
 
 def crop_image_and_text(document):
@@ -81,8 +62,6 @@ def crop_image_and_text(document):
 
     scan = utils.crop_rectangle_warp(orig, max_box.reshape(4, 2), ratio)
 
-    validate_image_section(max_x, page.shape[1])
-
     # -----------------------
     # Extracting text section
     # -----------------------
@@ -111,7 +90,6 @@ def crop_image_and_text(document):
     # Get lowest line
     lowest = get_y(sorted(h_lines, key=get_y, reverse=True)[0])
 
-    validate_text_section(lowest)
 
     text_section = orig[0:int(lowest * ratio), 0:width]
 

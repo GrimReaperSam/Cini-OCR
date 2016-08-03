@@ -3,12 +3,12 @@ import cv2
 import zbarlight
 from PIL import Image
 from kraken import binarization
-import utils
+from .. import utils
 
 HEIGHT_RESIZE = 2000.0
 
 
-def detect(page):
+def detect_and_read(page):
     """
         Given a verso page detects the existence of a barcode and returns its value,
         otherwise an empty string.
@@ -41,7 +41,7 @@ def detect(page):
         c = sorted(contours, key=cv2.contourArea, reverse=True)[0]
 
         rect = cv2.minAreaRect(c)
-        barcode_box = np.int0(cv2.boxPoints(rect))
+        barcode_box = cv2.boxPoints(rect).astype(np.int)
 
         im = utils.crop_rectangle_warp(orig, barcode_box.reshape(4, 2), ratio, amount=5)
         return _read(im)
@@ -53,4 +53,5 @@ def _read(cv2_image):
     codes = zbarlight.scan_codes('code39', barcode_binary)
     if codes:
         return codes[0].decode('utf-8')
-    return ''
+    else:
+        return ''

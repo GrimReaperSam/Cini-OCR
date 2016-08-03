@@ -1,9 +1,11 @@
-import unittest
-import re
-import os
-import cv2
-import barcode
 import json
+import os
+import re
+import unittest
+
+import cv2
+
+from ciniocr.utils import barcode
 
 
 class DecoderTest(unittest.TestCase):
@@ -16,6 +18,6 @@ class DecoderTest(unittest.TestCase):
                 continue
             name = re.sub('ve.png', '', filename)
             im = cv2.imread("../results/cardboards/%s" % filename)
-            bar_code = barcode.detect(im)
+            bar_code = barcode.detect_and_read(im)
             self.assertEqual(bar_code, expected[name],
                              "Failed at %s, found %s, expected %s" % (name, bar_code, expected[name]))

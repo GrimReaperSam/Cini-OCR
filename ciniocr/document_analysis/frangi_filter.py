@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.ndimage.filters import convolve
 
+
 def Hessian2D(I, Sigma=1):
     """
     This function Hessian2 filters the image with 2nd derivatives of a
@@ -24,7 +25,6 @@ def Hessian2D(I, Sigma=1):
 
     return Dxx, Dxy, Dyy
 
-# --------------------------------------------------------
 
 def eig2image(Dxx, Dxy, Dyy):
     """
@@ -68,10 +68,9 @@ def eig2image(Dxx, Dxy, Dyy):
 
     return Lambda1, Lambda2, Ix, Iy
 
-# --------------------------------------------------------
 
-def FrangiFilter2D(I, FrangiScaleRange=np.array([1, 10]), FrangiScaleRatio=2,
-                   FrangiBetaOne=0.5, FrangiBetaTwo=15, verbose=False, BlackWhite=True):
+def frangi_filter_2d(I, FrangiScaleRange=np.array([1, 10]), FrangiScaleRatio=2,
+                     FrangiBetaOne=0.5, FrangiBetaTwo=15, verbose=False, BlackWhite=True):
     """
     This function FRANGIFILTER2D uses the eigenvectors of the Hessian to
     compute the likeliness of an image region to vessels, according
@@ -105,7 +104,7 @@ def FrangiFilter2D(I, FrangiScaleRange=np.array([1, 10]), FrangiScaleRatio=2,
             print('Current Frangi Filter Sigma: ', str(sigmas[i]))
 
         # Make 2D hessian
-        Dxx, Dxy, Dyy = Hessian2D(I, sigmas[i]);
+        Dxx, Dxy, Dyy = Hessian2D(I, sigmas[i])
 
         # Correct for scale
         Dxx = (sigmas[i]**2)*Dxx
