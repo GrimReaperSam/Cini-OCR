@@ -45,9 +45,9 @@ destination_folder = destination_folder.resolve()
 # Reading Log File #
 ####################
 processed_images = []
-log_file = destination_folder / VISITED_LOG_FILE_NAME
-if log_file.exists():
-    with log_file.open() as f:
+processed_file = destination_folder / VISITED_LOG_FILE_NAME
+if processed_file.exists():
+    with processed_file.open() as f:
         processed_images = [line.rstrip('\n') for line in f]
 
 
@@ -110,7 +110,7 @@ def process_one(file):
 
     data = {'barcode': detected_barcode,
             'segments': extracted_data}
-    with open(str(current_folder / 'data.json')) as f:
+    with open(str(current_folder / 'data.json'), 'w') as f:
         json.dump(data, f)
 
 
@@ -119,7 +119,7 @@ def process_one(file):
     ######################
     if name not in processed_images and processed_successfully:
         processed_images.append(name)
-        with log_file.open('a') as f:
+        with processed_file.open('a') as f:
             f.write(name + '\n')
 
 nb_workers = int(args['nb_workers'])

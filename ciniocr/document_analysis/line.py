@@ -42,7 +42,7 @@ def get_line_mask(image, num_iterations=6, vertical=False):
     return cv2.threshold(tmp, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
 
 
-def close_lines(image, kernel_size=200):
+def close_lines(image, kernel_size=150):
     image[-10:, :] = 255
     image[:10, :] = 255
     image[:, :10] = 255

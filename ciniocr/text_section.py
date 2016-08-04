@@ -103,7 +103,8 @@ class TextSection:
         assert self._extracted_data is not None, 'Run extract_text first'
         data = []
         for d in self._extracted_data:
-            data.append({''})
+            data.append(d.to_dict())
+        return data
 
     def get_extraced_text(self) -> List[TextFragment]:
         assert self._extracted_data is not None, 'Run extract_text first'
