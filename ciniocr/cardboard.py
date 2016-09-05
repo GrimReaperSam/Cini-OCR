@@ -35,7 +35,7 @@ class RectoCardboard:
         mask = np.ones(opened.shape, dtype=np.uint8)
         border_margin = int(gray_filtered.shape[1]*0.05)
         mask[:border_margin, :], mask[-border_margin:, :] = 0, 0
-        mask[:, border_margin], mask[:, -border_margin:] = 0, 0
+        mask[:, :border_margin], mask[:, -border_margin:] = 0, 0
 
         image_bounds_resized = document_analysis.find_convex_hull_rectangle(opened, mask)
         # image_bounds_resized = document_analysis.find_biggest_rectangle(gray_filtered,

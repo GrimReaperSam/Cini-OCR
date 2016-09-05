@@ -13,7 +13,7 @@ from ciniocr import DocumentInfo, RawScan
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-r", "--raws", required=True,
-                help="Folder with raw images")
+                help="Folder with raw images or text files with filenames to be processed")
 ap.add_argument("-d", "--destination", required=True,
                 help="Folder where the results will be saved")
 ap.add_argument("-s", "--skip-processed", required=False, default=False, help="Skips already processed images")
@@ -29,8 +29,17 @@ skip_processed = args['skip_processed']
 raws_path = args['raws']
 raws_folder = Path(raws_path)
 if not raws_folder.exists():
-    raise Exception("Raws folder not found under %s" % raws_folder)
+    raise Exception("Raws files not found under %s" % raws_folder)
 raws_folder = raws_folder.resolve()
+if raws_folder.is_dir():
+    raw_files = glob.glob('{}/**/*'.format(raws_folder))
+else:
+    assert raws_folder.is_file()
+    raw_files = []
+    with raws_folder.open('r') as f:
+        raw_files = f.read().split('\n')
+        raw_files = [e for e in raw_files if e != '']
+
 
 #############################################
 # Getting destination folder or creating it #
@@ -137,4 +146,4 @@ logger.setLevel(logging.DEBUG)
 
 
 with ProcessPoolExecutor(max_workers=nb_workers) as e:
-    e.map(process_one, glob.glob('{}/**/*'.format(raws_folder)))
+    e.map(process_one, raw_files)
